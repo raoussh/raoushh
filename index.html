@@ -1,0 +1,179 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+void main() {
+  runApp(const ITCareersApp());
+}
+
+class ITCareersApp extends StatelessWidget {
+  const ITCareersApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'IT Careers',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomePage(),
+    );
+  }
+}
+
+/* ================= HOME PAGE ================= */
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  final List<Map<String, String>> jobs = const [
+    {
+      "title": "مبرمج",
+      "desc":
+          "يقوم بكتابة وتطوير البرامج والتطبيقات باستخدام لغات برمجة مختلفة.",
+    },
+    {
+      "title": "محلل بيانات",
+      "desc": "يحلل البيانات لاستخراج معلومات تساعد في اتخاذ القرار.",
+    },
+    {
+      "title": "مختص أمن سيبراني",
+      "desc": "يحمي الأنظمة والشبكات من الهجمات الإلكترونية.",
+    },
+    {
+      "title": "مطور تطبيقات",
+      "desc": "يطور تطبيقات الهواتف الذكية لأنظمة Android و iOS.",
+    },
+    {"title": "مختص شبكات", "desc": "يدير الشبكات ويضمن عملها بكفاءة وأمان."},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('الوظائف المهنية في IT')),
+      body: ListView.builder(
+        itemCount: jobs.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: ListTile(
+              title: Text(jobs[index]["title"]!),
+              trailing: const Icon(Icons.arrow_forward),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => JobDetails(job: jobs[index]),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.quiz),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const QuizPage()),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/* ================= JOB DETAILS ================= */
+
+class JobDetails extends StatelessWidget {
+  final Map<String, String> job;
+
+  const JobDetails({super.key, required this.job});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(job["title"]!)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(job["desc"]!, style: const TextStyle(fontSize: 18)),
+      ),
+    );
+  }
+}
+
+/* ================= QUIZ PAGE ================= */
+
+class QuizPage extends StatefulWidget {
+  const QuizPage({super.key});
+
+  @override
+  State<QuizPage> createState() => _QuizPageState();
+}
+
+class _QuizPageState extends State<QuizPage> {
+  int questionIndex = 0;
+  int score = 0;
+
+  final List<Map<String, Object>> questions = [
+    {
+      "question": "من هو المسؤول عن حماية الأنظمة؟",
+      "options": ["مبرمج", "مختص أمن سيبراني", "محلل بيانات"],
+      "answer": 1,
+    },
+    {
+      "question": "من يعمل على تحليل البيانات؟",
+      "options": ["محلل بيانات", "مختص شبكات", "مطور تطبيقات"],
+      "answer": 0,
+    },
+  ];
+
+  void answerQuestion(int selected) {
+    if (selected == questions[questionIndex]["answer"]) {
+      score++;
+    }
+
+    setState(() {
+      questionIndex++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (questionIndex >= questions.length) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("النتيجة")),
+        body: Center(
+          child: Text(
+            "نتيجتك: $score / ${questions.length}",
+            style: const TextStyle(fontSize: 24),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("اختبار قصير")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text(
+              questions[questionIndex]["question"] as String,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 20),
+            ...(questions[questionIndex]["options"] as List<String>)
+                .asMap()
+                .entries
+                .map((entry) {
+                  return ElevatedButton(
+                    onPressed: () => answerQuestion(entry.key),
+                    child: Text(entry.value),
+                  );
+                }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
